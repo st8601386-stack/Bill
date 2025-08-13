@@ -1,219 +1,473 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Beeru Bike Point - Premium Billing</title>
-<style>
-  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin:0; background: #f0f4f8; }
-  header { background: #4a90e2; padding: 20px; color: #fff; text-align: center; border-bottom: 4px solid #357ab8; }
-  h1 { margin: 0; font-family: 'Comic Sans MS', cursive; }
-  main { padding: 20px; max-width: 1200px; margin:auto; background: #fff; border-radius:12px; box-shadow: 0 8px 20px rgba(0,0,0,0.1);}
-  h2 { margin-top:0; color:#2c3e50; }
-
-  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-  th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-  th { background: #4a90e2; color: #fff; border-radius:6px; }
-  input[type="text"], input[type="number"] { width: 100%; padding: 5px; border-radius: 6px; border: 1px solid #aaa; }
-  button { padding: 8px 14px; border: none; background: #4a90e2; color: white; cursor: pointer; border-radius: 6px; margin:2px;}
-  button:hover { background: #357ab8; }
-  .danger { background: #e74c3c; }
-  .danger:hover { background: #c0392b; }
-  .success { background: #2ecc71; }
-  .success:hover { background: #27ae60; }
-
-  footer { text-align: center; padding: 12px; margin-top:20px; font-size:14px; color:#555; }
-
-  /* Modal */
-  .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); justify-content:center; align-items:center; }
-  .modal.open { display: flex; }
-  .modal-content { background: #fff; padding: 20px; border-radius: 12px; max-width: 800px; width: 90%; max-height: 90%; overflow:auto; box-shadow:0 10px 30px rgba(0,0,0,0.2);}
-  .modal-content h3 { margin-top:0; text-align:center; }
-  .close-btn { float:right; cursor:pointer; font-size:22px; background:none; border:none; color:#e74c3c; }
-
-  /* Logo */
-  .logo { width:60px; height:60px; object-fit: contain; display:block; margin:auto; margin-bottom:10px; }
-
-  .customer-info { display:flex; justify-content:space-between; margin-top:10px; margin-bottom:10px; }
-  .customer-info div { text-align:left; }
-</style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Beeru Bike Point — Cloud Billing</title>
+  <style>
+    :root{
+      --bg1:#0b1220; --bg2:#101a2f; --glass: rgba(255,255,255,0.06); --border: rgba(255,255,255,0.15);
+      --text:#e7eeff; --muted:#b3c0e6; --good:#2ee6a6; --danger:#ff4d6d;
+      --grad1:#5b8cff; --grad2:#8a5bff; --grad3:#00e0ff;
+    }
+    body{
+      margin:0; color:var(--text); font-family: ui-sans-serif, system-ui, Segoe UI, Roboto, Arial;
+      background: radial-gradient(1200px 800px at 10% -10%, rgba(91,140,255,.30), transparent 60%),
+                  radial-gradient(900px 600px at 90% 110%, rgba(0,224,255,.25), transparent 60%),
+                  linear-gradient(135deg, var(--bg1), var(--bg2));
+      min-height:100svh; overflow-x:hidden;
+    }
+    .bg-anim{ position:fixed; inset:-20vmax; background: conic-gradient(from 0deg, rgba(138,91,255,.15), rgba(0,224,255,.1), rgba(138,91,255,.15));
+      filter: blur(80px) saturate(160%); animation: spin 30s linear infinite; z-index:-1;}
+    @keyframes spin { to { transform: rotate(360deg);} }
+    .wrap{ max-width:1100px; margin:auto; padding:28px; }
+    header{
+      display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px;
+      padding:24px 20px; margin-bottom:22px; background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
+      border:1px solid var(--border); border-radius:22px; backdrop-filter: blur(10px); box-shadow: 0 0 24px rgba(0,224,255,.25);
+      text-align:center;
+    }
+    header img.logo{ width:76px; height:76px; border-radius:50%; object-fit:cover; box-shadow:0 0 24px rgba(0,224,255,.35);}
+    h1{
+      margin:0; font-weight:800; line-height:1; font-size: clamp(28px, 4.5vw, 48px);
+      background: linear-gradient(90deg, var(--grad1), var(--grad3), var(--grad2));
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+      text-shadow: 0 0 10px rgba(91,140,255,.35);
+      -webkit-box-reflect: below -6px linear-gradient(transparent 0%, rgba(255,255,255,.07) 30%, transparent 60%);
+    }
+    .sub{ margin:0; color:var(--muted); font-size:14px; }
+    .badge{ padding:6px 10px; font-size:12px; letter-spacing:.4px; color:var(--muted); border:1px solid var(--border); border-radius:999px; background:var(--glass);}
+    .card{
+      background: var(--glass); border:1px solid var(--border); border-radius:20px; padding:18px;
+      backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,.25); margin-bottom:18px;
+    }
+    .card h2{ margin:0 0 12px; font-size:18px; color:#eaf2ff; letter-spacing:.2px; display:flex; align-items:center; gap:8px;}
+    .grid{ display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:12px; }
+    label{ display:flex; flex-direction:column; font-size:12px; color:var(--muted); gap:6px; }
+    input[type="text"], input[type="number"]{
+      background: rgba(255,255,255,.06); border:1px solid var(--border); color:var(--text);
+      border-radius:12px; padding:10px 12px; outline:none; transition: box-shadow .2s, border-color .2s, transform .1s;
+    }
+    input:focus{ border-color: rgba(91,140,255,.8); box-shadow: 0 0 0 3px rgba(91,140,255,.25), 0 0 20px rgba(0,224,255,.2); transform: translateY(-1px); }
+    .btn{ cursor:pointer; border:none; border-radius:12px; padding:10px 14px; font-weight:700;
+      letter-spacing:.2px; transition: transform .08s ease, box-shadow .2s ease; color:#001022;}
+    .btn:hover{ transform: translateY(-1px); }
+    .btn.add{ background: linear-gradient(90deg, rgba(138,91,255,.95), rgba(0,224,255,.9)); box-shadow:0 0 18px rgba(138,91,255,.4), 0 0 28px rgba(0,224,255,.25); }
+    .btn.success{ background: linear-gradient(90deg, rgba(46,230,166,.95), rgba(0,224,255,.9)); box-shadow: 0 0 18px rgba(46,230,166,.45); color:#001713; }
+    .btn.secondary{ background: linear-gradient(90deg, rgba(91,140,255,.95), rgba(0,224,255,.9)); box-shadow:0 0 18px rgba(91,140,255,.4); }
+    .btn.danger{ background: linear-gradient(90deg, rgba(255,77,109,.95), rgba(255,122,150,.9)); color:#2b0010; box-shadow:0 0 18px rgba(255,77,109,.35); }
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; align-items:center; }
+    .sum{ margin-left:auto; font-weight:800; }
+    table{ width:100%; border-collapse: collapse; overflow:hidden; border-radius:16px; }
+    thead th{ font-size:12px; text-transform:uppercase; letter-spacing:.4px; background: linear-gradient(90deg, rgba(91,140,255,.22), rgba(0,224,255,.20)); color:#eaf2ff; border-bottom:1px solid var(--border); padding:10px; }
+    td{ padding:10px; border-bottom:1px solid rgba(255,255,255,.06); }
+    tbody tr{ background: rgba(255,255,255,.03); transition: background .2s, box-shadow .2s; }
+    tbody tr:hover{ background: rgba(255,255,255,.06); box-shadow: inset 0 0 0 9999px rgba(91,140,255,.03); }
+    .right{ text-align:right; } .center{ text-align:center; }
+    footer{ text-align:center; color:var(--muted); padding:24px 10px; }
+    @media (max-width: 900px){ .grid{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
+    @media (max-width: 640px){ .grid{ grid-template-columns: 1fr; } }
+  </style>
 </head>
 <body>
+  <div class="bg-anim" aria-hidden="true"></div>
 
-<header>
-  <h1>Beeru Bike Point</h1>
-  <p>Fast, Reliable & Affordable Bike Servicing</p>
-</header>
+  <div class="wrap">
+    <header>
+      <img class="logo" id="shopLogo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Motorcycle_icon.svg/512px-Motorcycle_icon.svg.png" alt="Shop Logo"/>
+      <span class="badge">Fast • Reliable • Affordable</span>
+      <h1>Beeru Bike Point</h1>
+      <p class="sub" id="shopAddress">Near Main Bazaar, Rampur, Uttar Pradesh - 244901 • +91 9876543210</p>
+    </header>
 
-<main>
-  <h2>Customer Details</h2>
-  <label>Name: <input type="text" id="custName" placeholder="e.g. Suraj"></label>
-  <label>Phone: <input type="text" id="custPhone" placeholder="e.g. 98xxxxxx22"></label>
-  <label>Vehicle No: <input type="text" id="vehicleNo" placeholder="e.g. MH-02-AB-1234"></label>
-
-  <h2>Create Bill</h2>
-  <table id="itemsTable">
-    <thead>
-      <tr>
-        <th>Sr No</th>
-        <th>Particulars</th>
-        <th>Qty</th>
-        <th>Rate (₹)</th>
-        <th>Amount (₹)</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-  <br>
-  <button onclick="addItem()">Add Item</button>
-  <button class="success" onclick="generateBill()">Generate Bill</button>
-
-  <div id="historySection">
-    <h2>Bill History</h2>
-    <table id="historyTable">
-      <thead>
-        <tr>
-          <th>Bill No</th>
-          <th>Date</th>
-          <th>Total (₹)</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-</main>
-
-<!-- Modal -->
-<div class="modal" id="invoiceModal">
-  <div class="modal-content">
-    <button class="close-btn" onclick="closeModal()">×</button>
-    <div id="invoiceBody"></div>
-  </div>
-</div>
-
-<footer>
-  &copy; 2025 Beeru Bike Point. All rights reserved.
-</footer>
-
-<script>
-  let items = [];
-  let billHistory = [];
-  let billCounter = 1;
-
-  function addItem() {
-    let tbody = document.querySelector("#itemsTable tbody");
-    let index = items.length;
-    items.push({particular:'', qty:1, rate:0});
-
-    let row = tbody.insertRow();
-    row.innerHTML = `
-      <td>${index+1}</td>
-      <td><input type="text" oninput="items[${index}].particular=this.value"></td>
-      <td><input type="number" value="1" min="1" oninput="items[${index}].qty=parseInt(this.value)||0;updateAmount(this,${index})"></td>
-      <td><input type="number" value="0" min="0" oninput="items[${index}].rate=parseFloat(this.value)||0;updateAmount(this,${index})"></td>
-      <td class="amt">0.00</td>
-      <td><button class="danger" onclick="removeItemRow(this,${index})">Delete</button></td>
-    `;
-    row.querySelector('input[type="text"]').focus();
-  }
-
-  function updateAmount(input,index){
-    let row = input.closest("tr");
-    let qty = parseFloat(row.querySelectorAll("input")[1].value)||0;
-    let rate = parseFloat(row.querySelectorAll("input")[2].value)||0;
-    row.querySelector(".amt").textContent = (qty*rate).toFixed(2);
-  }
-
-  function removeItemRow(btn,index){
-    btn.closest("tr").remove();
-    items.splice(index,1);
-    document.querySelectorAll("#itemsTable tbody tr").forEach((row,i)=>row.cells[0].textContent=i+1);
-  }
-
-  function generateBill(){
-    const custName = document.getElementById('custName').value.trim();
-    const custPhone = document.getElementById('custPhone').value.trim();
-    const vehicleNo = document.getElementById('vehicleNo').value.trim();
-    if(!custName || !vehicleNo) { alert("Enter customer name and vehicle no"); return; }
-
-    if(items.length===0) { alert("Add at least one item"); return; }
-    let total = items.reduce((sum,it)=>sum+(it.qty*it.rate),0);
-    let bill = { 
-      id: billCounter++, 
-      date: new Date().toLocaleString(), 
-      total: total.toFixed(2), 
-      items:[...items],
-      customer: { name: custName, phone: custPhone, vehicle: vehicleNo }
-    };
-    billHistory.push(bill);
-    renderHistory();
-    showInvoiceModal(bill);
-    items=[];
-    document.querySelector("#itemsTable tbody").innerHTML="";
-    document.getElementById('custName').value='';
-    document.getElementById('custPhone').value='';
-    document.getElementById('vehicleNo').value='';
-  }
-
-  function renderHistory(){
-    let tbody=document.querySelector("#historyTable tbody");
-    tbody.innerHTML="";
-    billHistory.forEach(bill=>{
-      let row=tbody.insertRow();
-      row.innerHTML=`
-        <td>${bill.id}</td>
-        <td>${bill.date}</td>
-        <td>₹${bill.total}</td>
-        <td>
-          <button onclick="showInvoiceModal(${bill.id})">View</button>
-          <button class="danger" onclick="deleteBill(${bill.id})">Delete</button>
-        </td>
-      `;
-    });
-  }
-
-  function showInvoiceModal(billOrId){
-    let bill = typeof billOrId==='object'? billOrId : billHistory.find(b=>b.id===billOrId);
-    if(!bill) return;
-    let html = `
-      
-      <h3>Invoice - Beeru Bike Point</h3>
-      <div class="customer-info">
-        <div><strong>Customer:</strong> ${bill.customer.name}<br><strong>Phone:</strong> ${bill.customer.phone||'-'}</div>
-        <div><strong>Vehicle:</strong> ${bill.customer.vehicle}<br><strong>Bill No:</strong> ${bill.id}</div>
-        <div><strong>Date:</strong> ${bill.date}</div>
+    <!-- Customer Details -->
+    <section class="card">
+      <h2>Customer Details</h2>
+      <div class="grid">
+        <label> Customer Name
+          <input type="text" id="custName" placeholder="e.g. Suraj"/>
+        </label>
+        <label> Phone
+          <input type="text" id="custPhone" placeholder="e.g. 98xxxxxx22"/>
+        </label>
+        <label> Address
+          <input type="text" id="custAddr" placeholder="Street / Area / City"/>
+        </label>
+        <label> Bike Model
+          <input type="text" id="bikeModel" placeholder="e.g. Splendor Plus"/>
+        </label>
+        <label> Bike No
+          <input type="text" id="vehicleNo" placeholder="e.g. MH-02-AB-1234"/>
+        </label>
+        <label> Service Notes
+          <input type="text" id="serviceNotes" placeholder="e.g. Engine oil, chain lube"/>
+        </label>
       </div>
-      <table>
+    </section>
+
+    <!-- Items -->
+    <section class="card">
+      <h2>Create Bill</h2>
+      <table id="itemsTable">
         <thead>
           <tr>
-            <th>Sr</th><th>Particulars</th><th>Qty</th><th>Rate (₹)</th><th>Amount (₹)</th>
+            <th class="center">Sr</th>
+            <th>Particulars</th>
+            <th class="center">Qty</th>
+            <th class="right">Rate (₹)</th>
+            <th class="right">Amount (₹)</th>
+            <th class="center">Action</th>
           </tr>
         </thead>
-        <tbody>
-          ${bill.items.map((it,i)=>`<tr>
-            <td>${i+1}</td>
-            <td>${it.particular}</td>
-            <td>${it.qty}</td>
-            <td>${it.rate.toFixed(2)}</td>
-            <td>${(it.qty*it.rate).toFixed(2)}</td>
-          </tr>`).join('')}
-        </tbody>
-        <tfoot>
-          <tr>
-            <td colspan="4" style="text-align:right;font-weight:bold">Total</td>
-            <td>${bill.total}</td>
-          </tr>
-        </tfoot>
+        <tbody></tbody>
       </table>
-      <p style="margin-top:10px; font-size:12px; color:#555;">* Computer generated invoice. Please keep this for records.</p>`;
-    document.getElementById('invoiceBody').innerHTML=html;
-    document.getElementById('invoiceModal').classList.add('open');
-  }
+      <div class="actions">
+        <button class="btn add" id="addItemBtn">+ Add Item</button>
+        <div class="sum">Total: ₹<span id="grandTotal">0.00</span></div>
+        <button class="btn success" id="genBillBtn">Generate Bill</button>
+      </div>
+    </section>
 
-  function closeModal(){ document.getElementById('invoiceModal').classList.remove('open'); }
-  function deleteBill(id){ billHistory=billHistory.filter(b=>b.id!==id); renderHistory(); }
-</script>
+    <!-- History -->
+    <section class="card">
+      <h2>Bill History</h2>
+      <table id="historyTable">
+        <thead>
+          <tr>
+            <th>Bill No</th>
+            <th>Date</th>
+            <th>Customer</th>
+            <th class="right">Total (₹)</th>
+            <th class="center">Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
 
+    <footer>© 2025 Beeru Bike Point • Cloud Billing</footer>
+  </div>
+
+  <!-- Firebase + App -->
+  <script type="module">
+    /* ======= SHOP INFO (easy to edit) ======= */
+    const SHOP = {
+      name: "Beeru Bike Point",
+      address: "Near Main Bazaar, Rampur, Uttar Pradesh - 244901",
+      phone: "+91 9876543210",
+      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Motorcycle_icon.svg/512px-Motorcycle_icon.svg.png"
+    };
+    document.getElementById("shopLogo").src = SHOP.logoUrl;
+    document.getElementById("shopAddress").textContent = SHOP.address + " • " + SHOP.phone;
+
+    /* ===== Firebase SDKs ===== */
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, orderBy, query, limit } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+    /* ===== Your Firebase Config (as provided) ===== */
+    const firebaseConfig = {
+      apiKey: "AIzaSyCyQP4zz2k00Wr1jLq4ZTcTJNHxsqH5eEE",
+      authDomain: "beeru-bike-bill.firebaseapp.com",
+      projectId: "beeru-bike-bill",
+      storageBucket: "beeru-bike-bill.firebasestorage.app",
+      messagingSenderId: "283569928366",
+      appId: "1:283569928366:web:5f027b08774453bcef553f",
+      measurementId: "G-YFG1858SPS"
+    };
+
+    /* ===== Init ===== */
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+
+    /* ===== State ===== */
+    let items = [];
+    let billsCache = [];
+    let nextBillId = 1;
+
+    /* ===== Elements ===== */
+    const tbodyItems   = document.querySelector("#itemsTable tbody");
+    const tbodyHistory = document.querySelector("#historyTable tbody");
+    const addItemBtn   = document.getElementById("addItemBtn");
+    const genBillBtn   = document.getElementById("genBillBtn");
+    const grandTotalEl = document.getElementById("grandTotal");
+
+    /* ===== Utilities ===== */
+    const currency = (n)=> Number(n||0).toFixed(2);
+    const nowString = ()=> new Date().toLocaleString();
+
+    function calcGrandTotal(){
+      const t = items.reduce((s,it)=> s + (Number(it.qty||0)*Number(it.rate||0)), 0);
+      grandTotalEl.textContent = currency(t);
+      return t;
+    }
+    function rerenderSr(){
+      [...tbodyItems.querySelectorAll("tr")].forEach((tr,i)=> tr.querySelector("td").textContent = i+1);
+    }
+    function makeInputRow(index){
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="center">${index+1}</td>
+        <td><input type="text" placeholder="Particular" /></td>
+        <td class="center"><input type="number" min="1" value="1"/></td>
+        <td class="right"><input type="number" min="0" step="0.01" value="0"/></td>
+        <td class="right amt">0.00</td>
+        <td class="center"><button class="btn danger btn-del">Delete</button></td>
+      `;
+      // setup state + bindings
+      items[index] = { particular:"", qty:1, rate:0 };
+      const [partI, qtyI, rateI] = tr.querySelectorAll("input");
+      const amtTd = tr.querySelector(".amt");
+
+      const recalc = ()=>{
+        const q = items[index].qty = parseFloat(qtyI.value)||0;
+        const r = items[index].rate = parseFloat(rateI.value)||0;
+        const a = q*r;
+        amtTd.textContent = currency(a);
+        calcGrandTotal();
+      };
+
+      partI.addEventListener("input", ()=>{ items[index].particular = partI.value; });
+      qtyI.addEventListener("input", recalc);
+      rateI.addEventListener("input", recalc);
+
+      tr.querySelector(".btn-del").addEventListener("click", ()=>{
+        tr.remove();
+        items.splice(index,1);
+        rerenderSr();
+        calcGrandTotal();
+      });
+
+      // initial amount compute
+      recalc();
+      return tr;
+    }
+    function clearItemTable(){
+      items = [];
+      tbodyItems.innerHTML = "";
+      calcGrandTotal();
+    }
+
+    /* ===== Firestore helpers ===== */
+    async function setNextBillId(){
+      const q = query(collection(db, "bills"), orderBy("id","desc"), limit(1));
+      const snap = await getDocs(q);
+      if(!snap.empty){ nextBillId = (Number(snap.docs[0].data().id)||0)+1; }
+      else nextBillId = 1;
+    }
+    async function loadHistory(){
+      tbodyHistory.innerHTML = "";
+      billsCache = [];
+      const q = query(collection(db, "bills"), orderBy("id","desc")); // latest first
+      const snap = await getDocs(q);
+      snap.forEach(d => billsCache.push({ _id:d.id, ...d.data() }));
+      for(const b of billsCache){
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${b.id}</td>
+          <td>${b.date}</td>
+          <td>${b.customer?.name || "-"}</td>
+          <td class="right">₹${b.total}</td>
+          <td class="center">
+            <button class="btn secondary btn-view" data-id="${b.id}">View</button>
+            <button class="btn danger btn-del-bill" data-doc="${b._id}">Delete</button>
+          </td>
+        `;
+        tbodyHistory.appendChild(tr);
+      }
+    }
+
+    function billToHTML(bill){
+      const itemsHTML = bill.items.map((it,i)=>`
+        <tr>
+          <td style="padding:8px;">${i+1}</td>
+          <td style="padding:8px;">${it.particular}</td>
+          <td style="padding:8px; text-align:right;">${it.qty}</td>
+          <td style="padding:8px; text-align:right;">${currency(it.rate)}</td>
+          <td style="padding:8px; text-align:right;">${currency(it.qty*it.rate)}</td>
+        </tr>
+      `).join('');
+      const cust = bill.customer || {};
+      return `
+        <div style="display:flex; gap:12px; align-items:center; margin-bottom:6px;">
+          <img src="${SHOP.logoUrl}" alt="logo" style="width:54px; height:54px; border-radius:12px; object-fit:cover;"/>
+          <div>
+            <div style="font-weight:800; font-size:22px;">${SHOP.name}</div>
+            <div style="font-size:12px; color:#666">${SHOP.address} • ${SHOP.phone}</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:12px; flex-wrap:wrap; margin:10px 0 14px; font-size:14px;">
+          <div style="flex:1 1 220px; border:1px solid #eee; border-radius:10px; padding:8px;">
+            <strong>Customer:</strong> ${cust.name||"-"}<br/><span style="color:#666">Phone:</span> ${cust.phone||'-'}
+          </div>
+          <div style="flex:1 1 220px; border:1px solid #eee; border-radius:10px; padding:8px;">
+            <strong>Vehicle:</strong> ${cust.vehicle||'-'}<br/><span style="color:#666">Model:</span> ${cust.model||'-'}
+          </div>
+          <div style="flex:1 1 220px; border:1px solid #eee; border-radius:10px; padding:8px;">
+            <strong>Bill No:</strong> ${bill.id}<br/><span style="color:#666">Date:</span> ${bill.date}
+          </div>
+        </div>
+        <div style="margin:4px 0 10px; font-size:12px; color:#444"><strong>Address:</strong> ${cust.address||'-'} | <strong>Notes:</strong> ${cust.notes||'-'}</div>
+
+        <table style="width:100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background:#f0f3f8;">
+              <th style="padding:8px; text-align:left; border:1px solid #e5e7eb;">Sr</th>
+              <th style="padding:8px; text-align:left; border:1px solid #e5e7eb;">Particulars</th>
+              <th style="padding:8px; text-align:right; border:1px solid #e5e7eb;">Qty</th>
+              <th style="padding:8px; text-align:right; border:1px solid #e5e7eb;">Rate (₹)</th>
+              <th style="padding:8px; text-align:right; border:1px solid #e5e7eb;">Amount (₹)</th>
+            </tr>
+          </thead>
+          <tbody>${itemsHTML}</tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4" style="padding:10px; text-align:right; font-weight:800; border:1px solid #e5e7eb;">Total</td>
+              <td style="padding:10px; text-align:right; font-weight:800; border:1px solid #e5e7eb;">₹${bill.total}</td>
+            </tr>
+          </tfoot>
+        </table>
+        <p style="margin-top:10px; font-size:12px; color:#666;">* Computer generated invoice.</p>
+      `;
+    }
+
+    function openInvoiceWindow(bill){
+      // Open synchronously to avoid popup block
+      const w = window.open('', '', 'width=900,height=700');
+      if(!w){ alert("Popup blocked! Please allow popups for this site."); return; }
+      const html = `
+        <html>
+          <head>
+            <title>Invoice #${bill.id} — ${SHOP.name}</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+            <style>
+              body{ font-family:Arial, sans-serif; padding:16px; }
+              @media print{ button{ display:none } }
+              table{ width:100%; border-collapse:collapse; }
+              th,td{ border:1px solid #ddd; }
+            </style>
+          </head>
+          <body>
+            ${billToHTML(bill)}
+            <div style="margin-top:12px;">
+              <button onclick="window.print()">🖨 Print</button>
+            </div>
+          </body>
+        </html>`;
+      w.document.open();
+      w.document.write(html);
+      w.document.close();
+      w.focus();
+    }
+
+    /* ===== Events ===== */
+    addItemBtn.addEventListener("click", ()=>{
+      const idx = items.length;
+      const row = makeInputRow(idx);
+      tbodyItems.appendChild(row);
+      row.querySelector('input[type="text"]').focus();
+    });
+
+    tbodyHistory.addEventListener("click", async (e)=>{
+      const vBtn = e.target.closest(".btn-view");
+      const dBtn = e.target.closest(".btn-del-bill");
+      if(vBtn){
+        const id = Number(vBtn.dataset.id);
+        const bill = billsCache.find(x => Number(x.id) === id);
+        if(bill) openInvoiceWindow(bill);
+      } else if(dBtn){
+        const docId = dBtn.dataset.doc;
+        if(confirm("Delete this bill?")){
+          await deleteDoc(doc(db, "bills", docId));
+          await loadHistory();
+          await setNextBillId();
+        }
+      }
+    });
+
+    // FIXED: Generate handler opens invoice window synchronously, then saves & renders
+    genBillBtn.addEventListener("click", async ()=>{
+      const custName = document.getElementById('custName').value.trim();
+      const custPhone= document.getElementById('custPhone').value.trim();
+      const custAddr = document.getElementById('custAddr').value.trim();
+      const bikeModel= document.getElementById('bikeModel').value.trim();
+      const vehicleNo= document.getElementById('vehicleNo').value.trim();
+      const notes    = document.getElementById('serviceNotes').value.trim();
+
+      if(!custName || !vehicleNo){ alert("Enter customer name and bike number"); return; }
+      if(items.length===0){ alert("Add at least one item"); return; }
+
+      const total = calcGrandTotal();
+
+      // Prepare bill
+      const bill = {
+        id: nextBillId, // assign current id (increment after save)
+        date: nowString(),
+        total: currency(total),
+        items: items.map(it => ({ particular:it.particular, qty:Number(it.qty)||0, rate:Number(it.rate)||0 })),
+        customer: { name:custName, phone:custPhone, address:custAddr, model:bikeModel, vehicle:vehicleNo, notes }
+      };
+
+      // Open print window NOW (to prevent popup blocker)
+      const printWin = window.open('', '', 'width=900,height=700');
+      if(!printWin){ alert("Popup blocked! Please allow popups for this site."); return; }
+      printWin.document.write("<html><head><title>Generating invoice...</title></head><body>Preparing invoice...</body></html>");
+      printWin.document.close();
+
+      try{
+        // Save to Firestore
+        await addDoc(collection(db, "bills"), bill);
+        nextBillId += 1; // increment next id only after save success
+        // Reset UI
+        document.getElementById('custName').value='';
+        document.getElementById('custPhone').value='';
+        document.getElementById('custAddr').value='';
+        document.getElementById('bikeModel').value='';
+        document.getElementById('vehicleNo').value='';
+        document.getElementById('serviceNotes').value='';
+        clearItemTable();
+
+        // Refresh history
+        await loadHistory();
+
+        // Render invoice into the already-opened window
+        const html = `
+          <html>
+            <head>
+              <title>Invoice #${bill.id} — ${SHOP.name}</title>
+              <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+              <style>
+                body{ font-family:Arial, sans-serif; padding:16px; }
+                @media print{ button{ display:none } }
+                table{ width:100%; border-collapse:collapse; }
+                th,td{ border:1px solid #ddd; }
+              </style>
+            </head>
+            <body>
+              ${billToHTML(bill)}
+              <div style="margin-top:12px;">
+                <button onclick="window.print()">🖨 Print</button>
+              </div>
+            </body>
+          </html>`;
+        printWin.document.open();
+        printWin.document.write(html);
+        printWin.document.close();
+        printWin.focus();
+      } catch(err){
+        console.error(err);
+        alert("Bill save failed. Check internet/Firebase rules.");
+        // Close the placeholder window if save failed
+        printWin.close();
+      }
+    });
+
+    /* ===== Boot (wrapped to avoid old-browser top-level await issues) ===== */
+    (async function boot(){
+      await setNextBillId();
+      await loadHistory();
+      // Ensure at least one row present for quick entry
+      if(items.length===0) document.getElementById("addItemBtn").click();
+    })();
+  </script>
 </body>
 </html>
