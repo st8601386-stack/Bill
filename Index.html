@@ -1318,7 +1318,7 @@
       doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
       doc.text('Total Amount:', 140, finalY);
-      doc.text('₹' + currentBill.total.toFixed(2), 170, finalY);
+      doc.text('' + currentBill.total.toFixed(2), 170, finalY);
       
       // Add rupees in words
       doc.setFontSize(10);
